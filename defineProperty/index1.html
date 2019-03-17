@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <script>
+      class Vue {
+        constructor(op) {
+          this.$el = op.el;
+          this.$data = op.data;
+          this._box={}
+          this.observer();
+          this.domserver();
+        }
+        observer() {
+            for(let key in this.$data){
+                this._box[key] = []
+                
+                let val = this.$data[key]
+                let _this =this 
+
+                Object.defineProperty(_this.$data,key,{
+                    get:function(){
+                        return val
+                    },
+                    set:function(newVal){
+                        console.log(newVal)
+                        if(newVal !== val){
+                            val = newVal
+                            _this._box[key].forEach(element => {
+                                element.upData()
+                            }); 
+                        }
+                    }
+                })
+            }
+        }
+        domserver() {
+            let nodes = document.querySelector(this.$el)
+            for(let i=0;i<nodes.children.length;i++){
+                if(nodes.children[i].length){
+                    this.domserver()
+                }
+                let node = nodes.children[i]
+                if(node.hasAttribute("v-text")){
+                    let vval = node.getAttribute("v-text") 
+                    this._box[vval].push(new Watcher(node,vval,this,"innerHTML"))
+                }
+                if(node.hasAttribute("v-model")){
+                    let vval = node.getAttribute("v-model") 
+                    this._box[vval].push(new Watcher(node,vval,this,"value"))
+                    var _this = this
+                    node.addEventListener("input",(function(){
+                        // console.log(node.value)
+                        return function(){
+                            _this.$data[vval]=node.value
+                        }
+                    })())
+                }
+            }
+
+        }
+      }
+      class Watcher{
+        constructor(node,vval,self,prop){
+            this.node = node;
+            this.vval = vval;
+            this.self = self;
+            this.prop = prop;
+            this.upData()
+        }
+        upData(){
+            this.node[this.prop] = this.self.$data[this.vval]
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <div v-text="upText"></div>
+      <div v-text="nextText"></div>
+      <input type="text" v-model="upText" />
+    </div>
+    <script>
+      const app = new Vue({
+        el: "#app",
+        data:{
+          upText: "我是你吧吧",
+          nextText:"doudoufei"
+        }
+      });
+    </script>
+  </body>
+</html>

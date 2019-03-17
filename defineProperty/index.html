@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>mvvm</title>
+    <script>
+      class Vue {
+        constructor(options) {
+          this.options = options;
+          this.$data = options.data;
+          this.$el = document.querySelector(options.el);
+          this._directives = {};
+
+          this.Oberver(this.$data);
+          this.Compile(this.$el);
+        }
+        //劫持数据
+        Oberver(data) {
+          for (let key in data) {
+            this._directives[key] = [];
+            let val = data[key];
+            let _this = this
+            Object.defineProperty(_this.$data,key,{
+              get:function(){
+                return val
+              },
+              set:function(newVal){
+                if(newVal !== val){
+                  val = newVal
+                  _this._directives[key].forEach(element => {
+                      element.update()
+                  });
+                }
+              }
+            })
+          }
+        }
+        //解析指令
+        Compile(el) {
+          let nodes = el.children;
+          for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+            if (node.children.length) {
+              this.Compile(node);
+            }
+            if (node.hasAttribute("v-text")) {
+              let attrVal = node.getAttribute("v-text");
+              this._directives[attrVal].push(
+                new Watcher(node, attrVal, this, "innerHTML")
+              );
+            }
+            if (node.hasAttribute("v-model")) {
+              let attrVal = node.getAttribute("v-model");
+              console.log(node,attrVal)
+              this._directives[attrVal].push(
+                new Watcher(node, attrVal, this, "value")
+              );
+              var _this = this
+              node.addEventListener('input',(function(){
+                return function(){
+                  _this.$data[attrVal] = node.value
+                }
+              })())
+            }
+          }
+        }
+      }
+      class Watcher {
+        constructor(el, vm, mySelf, attr) {
+          this.attr = attr;
+          this.el = el;
+          this.vm = vm;
+          this.mySelf = mySelf;
+          this.update();
+        }
+        update() {
+          this.el[this.attr] = this.mySelf.$data[this.vm];
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <h1>数据响应式</h1>
+      <div>
+        <div v-text="myText"></div>
+        <div v-text="myBox"></div>
+        <input type="text" v-model="myText" />
+      </div>
+    </div>
+    <script>
+      const app = new Vue({
+        el: "#app",
+        data: {
+          myText: "大吉大利，今晚吃鸡！",
+          myBox: "局部变化！"
+        }
+      });
+    </script>
+  </body>
+</html>
