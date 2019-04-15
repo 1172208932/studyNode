@@ -14,10 +14,23 @@ router.get('/user/:username', function (req, res, ) {
   res.send('user:' + req.params.username)
 })
 
-router.get('/list',function (req,res) {
-  res.render('list',{
-    title:'List',
-    items:[1991,'breed','express','Node.js']
+router.get('/list', function (req, res) {
+  res.render('list', {
+    title: 'List',
+    items: [1991, 'breed', 'express', 'Node.js']
   })
-  })
+})
+
+exports.index = function (req, res) {
+  res.render('index', {
+    title: 'Express'
+  });
+};
+exports.user = function (req, res) {};
+exports.post = function (req, res) {};
+exports.reg = function (req, res) {};
+exports.doReg = function (req, res) {};
+exports.login = function (req, res) {};
+exports.doLogin = function (req, res) {};
+exports.logout = function (req, res) {};
 module.exports = router;
