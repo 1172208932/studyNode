@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css">
+    <!-- <script src="main.js"></script> -->
+</head>
+
+<body>
+    <div id='app'>
+        <my-component></my-component>
+        <tbody is=”my-component”></tbody>
+        <!-- 常见的限制元素还有ul、ol、se ect -->
+        <my-component></my-component>
+
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script>
+    var d = {
+        count: 0
+    }
+    Vue.component('my-component', {
+        template: '<button @click="count++">{{count}}</button>',
+        data() {
+            return {
+                 count: 0
+            }
+        },
+    })
+    var app = new Vue({
+        el: '#app',
+        data: {
+
+        },
+        methods: {
+
+        }
+    })
+</script>
+
+</html>
